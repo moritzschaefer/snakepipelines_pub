@@ -1,0 +1,22 @@
+rmsk was obtained from
+http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/rmskOutCurrent.txt.gz <-
+http://hgdownload.soe.ucsc.edu/goldenPath/mm10/database/rmsk.txt.gz
+
+and chromosome names were converted (chr1 -> 1) in order to fit the rest of the pipeline
+
+Also
+
+awk -F $'\t' 'BEGIN {OFS = FS} {if ($8-$7 > 6000 && $11 ~ /L1Md[Gf|A|Tf]/) $13="L1_active"; \
+              if ($6 ~ /_/) $6=gensub(/.[^_]*_(.[^_]+)_?.*/, "\\1.1", "1", $6); print}' \
+              rmskOutCurrent.txt > rmskOutCurrent_activeL1s.txt
+
+was run to produce an alternative rmsk-file for which too-short L1-elements (from the active families) were filtered out. In this step, scaffolds that cannot be associated with chromosomes are also renamed to fit the naming schema of the genome we downloaded. (as a TODO, this command could/should be integrated into the python script
+
+
+python generate_rmsk_gtf.py 
+python rmsk_bed.py
+
+was used to generate gtf and bed files 
+
+
+grep L1MdA_VII rmskOutCurrent_activeL1s.txt | grep active | awk '{print $6 "\t" $7 "\t" $8 "\t\t\t" $10}' > L1MdA_VII_active.bed
